@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linux Desktop</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#10182c;color:white}
+.hidden{display:none!important}
+button{padding:12px 20px;border:0;border-radius:8px;cursor:pointer;font-weight:bold}
+#intro,#install,#desktop,#scare,#end{
+ position:fixed;inset:0;display:flex;align-items:center;
+ justify-content:center;padding:20px
+}
+#intro,#install{background:radial-gradient(circle,#293c66,#080b14)}
+.panel{width:min(700px,95vw);padding:32px;background:#111b30;
+ border:1px solid #526488;border-radius:16px}
+h1{font-size:clamp(28px,5vw,44px)}
+p{line-height:1.5;color:#cbd5e8}
+.track{height:15px;background:#34425b;border-radius:20px;overflow:hidden}
+#bar{height:100%;width:0;background:#70edcb}
+.stats{display:flex;justify-content:space-between;margin-top:10px}
+#desktop{background:linear-gradient(135deg,#172b50,#563875,#087b85);
+ display:block;padding:0}
+.topbar{height:36px;background:#101522dd;padding:10px 16px;
+ font-size:12px;display:flex;justify-content:space-between}
+.icons{padding:24px;display:grid;gap:22px;width:110px;text-align:center}
+.icon{font-size:32px}
+.window{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);
+ width:min(700px,90vw);background:#f4f6fb;color:#1b2435;
+ border-radius:12px;overflow:hidden;box-shadow:0 25px 70px #0008}
+.winhead{background:#dce3ed;padding:13px;color:#344056}
+.content{padding:24px}
+.option,.file{padding:13px;margin-top:12px;border-radius:8px;
+ background:#e8edf6;color:#172033}
+.file{display:inline-flex;gap:12px;align-items:center}
+#cursor{position:fixed;z-index:20;font-size:34px;
+ transition:left .8s,top .8s;pointer-events:none}
+#scare{z-index:30;background:#050508;display:none;flex-direction:column;
+ text-align:center}
+#scare.show{display:flex;animation:flash .12s steps(2) 5}
+.monster{font-size:min(58vw,400px);line-height:1;
+ animation:lunge .2s ease-in-out 4 alternate}
+.scream{font-size:clamp(30px,7vw,70px);color:#ff3333;font-weight:1000}
+#end{z-index:40;background:#11192b;display:none;text-align:center}
+#end.show{display:flex}
+@keyframes lunge{to{transform:scale(1.1) rotate(3deg)}}
+@keyframes flash{50%{background:#520c15}}
+</style>
+</head>
+<body>
+
+<section id="intro">
+ <div class="panel">
+  <h1>Linux Setup Simulator</h1>
+  <p>Демонстрация установки Linux, рабочего стола и браузера.</p>
+  <button id="start">Запустить</button>
+  <p>Tab завершает пранк. Реальная система и файлы не меняются.</p>
+ </div>
+</section>
+
+<section id="install" class="hidden">
+ <div class="panel">
+  <h1>Установка Linux…</h1>
+  <p id="status">Подготовка рабочего стола</p>
+  <div class="track"><div id="bar"></div></div>
+  <div class="stats"><span>Установка</span><b id="pct">0%</b></div>
+ </div>
+</section>
+
+<section id="desktop" class="hidden">
+ <div class="topbar"><span>◈ Activities</span><span>Linux Desktop　20:24</span></div>
+ <div class="icons">
+  <div><div class="icon">🗂️</div>Файлы</div>
+  <div><div class="icon">🌐</div>Браузер</div>
+  <div><div class="icon">⚙️</div>Настройки</div>
+ </div>
+
+ <div class="window" id="finishWindow">
+  <div class="winhead">Мастер установки Linux</div>
+  <div class="content">
+   <h2>Установка завершена!</h2>
+   <div class="option">✓ Системные компоненты</div>
+   <div class="option">✓ Настройка рабочего стола</div>
+   <div class="option">➜ Завершить установку</div>
+   <p><button id="finishBtn">Завершить установку</button></p>
+  </div>
+ </div>
+
+ <div class="window hidden" id="browser">
+  <div class="winhead">🌐 Браузер — Загрузки</div>
+  <div class="content">
+   <h2>Загрузки</h2>
+   <p>Домашняя папка / Downloads</p>
+   <div class="file" id="neo">
+    <span class="icon">📦</span>
+    <span><b>NeoForge</b><br><small>Демонстрационный файл</small></span>
+   </div>
+  </div>
+ </div>
+</section>
+
+<div id="cursor" class="hidden">➤</div>
+
+<section id="scare">
+ <div class="monster">👹</div>
+ <div class="scream">БУУУУ! 😈</div>
+ <p>Это всего лишь пранк!</p>
+ <button id="skip">Закончить</button>
+</section>
+
+<section id="end">
+ <div>
+  <div style="font-size:90px">😄</div>
+  <h1>ТЕБЯ РОЗЫГРАЛИ!</h1>
+  <p>Это был пранк. Linux не устанавливался.</p>
+ </div>
+</section>
+
+<script>
+const $=id=>document.getElementById(id);
+let started=false,ended=false,progress=0;
+let timers=[],audioContext;
+
+function later(fn,ms){
+ const t=setTimeout(()=>{if(!ended)fn()},ms);
+ timers.push(t);
+}
+function clearAll(){
+ timers.forEach(clearTimeout);
+ timers=[];
+}
+function show(id){
+ ["intro","install","desktop","scare","end"].forEach(x=>{
+  $(x).classList.add("hidden");
+  if(x==="scare"||x==="end")$(x).classList.remove("show");
+ });
+ if(id==="scare"||id==="end")$(id).classList.add("show");
+ else $(id).classList.remove("hidden");
+}
+function finish(){
+ if(ended)return;
+ ended=true;
+ clearAll();
+ $("cursor").classList.add("hidden");
+ show("end");
+}
+function moveCursor(x,y,callback){
+ const c=$("cursor");
+ c.classList.remove("hidden");
+ c.style.left=x+"%";
+ c.style.top=y+"%";
+ later(()=>{
+  if(callback)callback();
+ },1000);
+}
+function screamSound(){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC)return;
+  audioContext=audioContext||new AC();
+  if(audioContext.state==="suspended")audioContext.resume();
+  const ctx=audioContext,now=ctx.currentTime,duration=1.6;
+
+  // Синтезированный мультяшный вопль — без внешних файлов.
+  const osc=ctx.createOscillator();
+  const osc2=ctx.createOscillator();
+  const gain=ctx.createGain();
+  const filter=ctx.createBiquadFilter();
+
+  osc.type="sawtooth";
+  osc.frequency.setValueAtTime(600,now);
+  osc.frequency.exponentialRampToValueAtTime(1200,now+.2);
+  osc.frequency.exponentialRampToValueAtTime(500,now+1.2);
+
+  osc2.type="square";
+  osc2.frequency.setValueAtTime(430,now);
+  osc2.frequency.exponentialRampToValueAtTime(850,now+.2);
+  osc2.frequency.exponentialRampToValueAtTime(350,now+1.2);
+
+  filter.type="lowpass";
+  filter.frequency.value=2000;
+
+  gain.gain.setValueAtTime(.0001,now);
+  gain.gain.exponentialRampToValueAtTime(.16,now+.05);
+  gain.gain.setValueAtTime(.16,now+.7);
+  gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
+
+  osc.connect(filter);
+  osc2.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(now);
+  osc2.start(now);
+  osc.stop(now+duration);
+  osc2.stop(now+duration);
+ }catch(e){}
+}
+function showScare(){
+ if(ended)return;
+ $("cursor").classList.add("hidden");
+ show("scare");
+ screamSound();
+ later(finish,4500);
+}
+
+$("start").onclick=()=>{
+ if(started||ended)return;
+ started=true;
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(AC){audioContext=new AC();audioContext.resume()}
+ }catch(e){}
+
+ show("install");
+ // Абсолютный предел: пять минут от старта.
+ later(finish,300000);
+
+ const interval=setInterval(()=>{
+  if(ended){clearInterval(interval);return}
+  progress=Math.min(100,progress+Math.random()*3+1);
+  $("bar").style.width=progress+"%";
+  $("pct").textContent=Math.floor(progress)+"%";
+  $("status").textContent=progress<40?"Подготовка системы…":
+   progress<80?"Копирование файлов…":"Завершение настройки…";
+
+  if(progress>=100){
+   clearInterval(interval);
+   show("desktop");
+
+   // Курсор автоматически нажимает кнопку завершения.
+   later(()=>{
+    moveCursor(68,65,()=>{
+     $("finishWindow").classList.add("hidden");
+     $("browser").classList.remove("hidden");
+
+     // Затем курсор открывает фальшивый файл NeoForge.
+     later(()=>{
+      moveCursor(47,56,showScare);
+     },1200);
+    });
+   },1000);
+  }
+ },500);
+};
+
+$("finishBtn").onclick=()=>{
+ if(ended)return;
+ $("finishWindow").classList.add("hidden");
+ $("browser").classList.remove("hidden");
+ moveCursor(47,56,showScare);
+};
+$("neo").onclick=showScare;
+$("skip").onclick=finish;
+
+document.addEventListener("keydown",e=>{
+ if(e.key==="Tab"&&started&&!ended){
+  e.preventDefault();
+  finish();
+ }
+});
+</script>
+</body>
+</html>
