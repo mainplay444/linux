@@ -3,264 +3,595 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Linux Desktop</title>
+<title>Linux Setup Simulator</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#10182c;color:white}
-.hidden{display:none!important}
-button{padding:12px 20px;border:0;border-radius:8px;cursor:pointer;font-weight:bold}
-#intro,#install,#desktop,#scare,#end{
- position:fixed;inset:0;display:flex;align-items:center;
- justify-content:center;padding:20px
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#10182c;
+  color:white;
+  overflow:hidden
 }
-#intro,#install{background:radial-gradient(circle,#293c66,#080b14)}
-.panel{width:min(700px,95vw);padding:32px;background:#111b30;
- border:1px solid #526488;border-radius:16px}
+.hidden{display:none!important}
+button{
+  padding:13px 21px;
+  border:0;
+  border-radius:9px;
+  font-weight:bold;
+  cursor:pointer;
+  background:#70edcb;
+  color:#10182c;
+  font-size:15px
+}
+button:hover{filter:brightness(1.08)}
+#intro,#install,#desktop,#scare,#end{
+  position:fixed;
+  inset:0;
+  align-items:center;
+  justify-content:center;
+  padding:20px
+}
+#intro,#install{
+  display:flex;
+  background:radial-gradient(circle,#293c66,#080b14)
+}
+.panel{
+  width:min(700px,95vw);
+  padding:30px;
+  background:#111b30;
+  border:1px solid #526488;
+  border-radius:16px
+}
 h1{font-size:clamp(28px,5vw,44px)}
 p{line-height:1.5;color:#cbd5e8}
-.track{height:15px;background:#34425b;border-radius:20px;overflow:hidden}
-#bar{height:100%;width:0;background:#70edcb}
-.stats{display:flex;justify-content:space-between;margin-top:10px}
-#desktop{background:linear-gradient(135deg,#172b50,#563875,#087b85);
- display:block;padding:0}
-.topbar{height:36px;background:#101522dd;padding:10px 16px;
- font-size:12px;display:flex;justify-content:space-between}
-.icons{padding:24px;display:grid;gap:22px;width:110px;text-align:center}
+.track{
+  height:15px;
+  background:#34425b;
+  border-radius:20px;
+  overflow:hidden
+}
+#bar{
+  height:100%;
+  width:0;
+  background:#70edcb;
+  transition:width .3s
+}
+.stats{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px
+}
+#desktop{
+  display:block;
+  padding:0;
+  background:linear-gradient(135deg,#172b50,#563875,#087b85)
+}
+.topbar{
+  height:38px;
+  background:#101522dd;
+  padding:11px 16px;
+  font-size:12px;
+  display:flex;
+  justify-content:space-between
+}
+.icons{
+  padding:24px;
+  display:grid;
+  gap:22px;
+  width:120px;
+  text-align:center;
+  font-size:13px
+}
 .icon{font-size:32px}
-.window{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);
- width:min(700px,90vw);background:#f4f6fb;color:#1b2435;
- border-radius:12px;overflow:hidden;box-shadow:0 25px 70px #0008}
-.winhead{background:#dce3ed;padding:13px;color:#344056}
+.window{
+  position:absolute;
+  left:50%;
+  top:51%;
+  transform:translate(-50%,-50%);
+  width:min(700px,90vw);
+  background:#f4f6fb;
+  color:#1b2435;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 25px 70px #0008
+}
+.winhead{
+  background:#dce3ed;
+  padding:13px;
+  color:#344056
+}
 .content{padding:24px}
-.option,.file{padding:13px;margin-top:12px;border-radius:8px;
- background:#e8edf6;color:#172033}
-.file{display:inline-flex;gap:12px;align-items:center}
-#cursor{position:fixed;z-index:20;font-size:34px;
- transition:left .8s,top .8s;pointer-events:none}
-#scare{z-index:30;background:#050508;display:none;flex-direction:column;
- text-align:center}
-#scare.show{display:flex;animation:flash .12s steps(2) 5}
-.monster{font-size:min(58vw,400px);line-height:1;
- animation:lunge .2s ease-in-out 4 alternate}
-.scream{font-size:clamp(30px,7vw,70px);color:#ff3333;font-weight:1000}
-#end{z-index:40;background:#11192b;display:none;text-align:center}
-#end.show{display:flex}
-@keyframes lunge{to{transform:scale(1.1) rotate(3deg)}}
-@keyframes flash{50%{background:#520c15}}
+.option,.file{
+  padding:13px;
+  margin-top:12px;
+  border-radius:8px;
+  background:#e8edf6;
+  color:#172033
+}
+.file{
+  display:inline-flex;
+  gap:12px;
+  align-items:center;
+  cursor:pointer
+}
+#cursor{
+  position:fixed;
+  z-index:20;
+  font-size:34px;
+  transition:left .8s,top .8s;
+  pointer-events:none
+}
+
+/* Скример */
+#scare{
+  z-index:30;
+  background:#050508;
+  display:none;
+  flex-direction:column;
+  text-align:center
+}
+#scare.show{
+  display:flex;
+  animation:flash .16s steps(2) 5
+}
+.monster{
+  font-size:min(48vw,300px);
+  line-height:1;
+  animation:lunge .2s ease-in-out 4 alternate
+}
+.scream{
+  font-size:clamp(30px,7vw,70px);
+  color:#ff3333;
+  font-weight:1000
+}
+
+/* Финал */
+#end{
+  z-index:40;
+  display:none;
+  overflow:auto;
+  background:
+    radial-gradient(ellipse at center,#52101b 0%,#160711 55%,#050308 100%);
+  text-align:center
+}
+#end.show{
+  display:flex;
+  animation:appear .45s ease-out
+}
+.final-screen{
+  width:min(850px,96vw);
+  padding:15px 0
+}
+.warning{
+  color:#ff4545;
+  font-size:clamp(18px,4vw,29px);
+  font-weight:1000;
+  animation:blink .3s infinite alternate
+}
+.gpu{
+  font-size:clamp(65px,15vw,130px);
+  margin:10px 0;
+  animation:shake .12s infinite alternate
+}
+.rx-title{
+  color:#ff3030;
+  font-size:clamp(30px,7vw,62px);
+  font-weight:1000;
+  line-height:1.12;
+  text-shadow:0 0 12px #ff0000,0 0 35px #a00020;
+  animation:blink .5s infinite alternate
+}
+.glitch{
+  display:inline-block;
+  padding:10px 18px;
+  background:#d71935;
+  color:white;
+  font-size:clamp(13px,3vw,19px);
+  font-weight:900;
+  letter-spacing:3px;
+  margin:8px
+}
+.final-text{font-size:17px}
+.yarik{
+  color:#ffe65b;
+  font-size:clamp(30px,7vw,60px);
+  text-shadow:0 0 16px #ff8c00;
+  animation:bounce .4s infinite alternate
+}
+#replayBtn{
+  margin-top:10px;
+  background:#ffe65b
+}
+@keyframes blink{
+  from{opacity:.65}
+  to{opacity:1}
+}
+@keyframes shake{
+  from{transform:rotate(-3deg) scale(.98)}
+  to{transform:rotate(3deg) scale(1.03)}
+}
+@keyframes bounce{
+  from{transform:scale(.96)}
+  to{transform:scale(1.05)}
+}
+@keyframes appear{
+  from{transform:scale(.7);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+@keyframes lunge{
+  to{transform:scale(1.12) rotate(3deg)}
+}
+@keyframes flash{
+  50%{background:#520c15}
+}
+@media(max-width:500px){
+  .panel{padding:22px}
+  .content{padding:16px}
+  .icons{padding:15px;gap:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .monster,.gpu,.rx-title,.yarik,.warning{animation:none}
+}
 </style>
 </head>
+
 <body>
 
 <section id="intro">
- <div class="panel">
-  <h1>Linux Setup Simulator</h1>
-  <p>Демонстрация установки Linux, рабочего стола и браузера.</p>
-  <button id="start">Запустить</button>
-  <p>Tab завершает пранк. Реальная система и файлы не меняются.</p>
- </div>
+  <div class="panel">
+    <h1>Linux Setup Simulator</h1>
+    <p>
+      Демонстрация установки Linux, рабочего стола,
+      браузера и запуска NeoForge.
+    </p>
+    <button id="start">Запустить установку</button>
+    <p>Нажми Tab в любой момент, чтобы закончить пранк.</p>
+    <p><small>Это симуляция. Настоящая система не изменяется.</small></p>
+  </div>
 </section>
 
 <section id="install" class="hidden">
- <div class="panel">
-  <h1>Установка Linux…</h1>
-  <p id="status">Подготовка рабочего стола</p>
-  <div class="track"><div id="bar"></div></div>
-  <div class="stats"><span>Установка</span><b id="pct">0%</b></div>
- </div>
+  <div class="panel">
+    <h1>Установка Linux…</h1>
+    <p id="status">Подготовка системы…</p>
+    <div class="track"><div id="bar"></div></div>
+    <div class="stats">
+      <span>Установка</span>
+      <b id="pct">0%</b>
+    </div>
+  </div>
 </section>
 
 <section id="desktop" class="hidden">
- <div class="topbar"><span>◈ Activities</span><span>Linux Desktop　20:24</span></div>
- <div class="icons">
-  <div><div class="icon">🗂️</div>Файлы</div>
-  <div><div class="icon">🌐</div>Браузер</div>
-  <div><div class="icon">⚙️</div>Настройки</div>
- </div>
-
- <div class="window" id="finishWindow">
-  <div class="winhead">Мастер установки Linux</div>
-  <div class="content">
-   <h2>Установка завершена!</h2>
-   <div class="option">✓ Системные компоненты</div>
-   <div class="option">✓ Настройка рабочего стола</div>
-   <div class="option">➜ Завершить установку</div>
-   <p><button id="finishBtn">Завершить установку</button></p>
+  <div class="topbar">
+    <span>◈ Activities</span>
+    <span>Linux Desktop　20:24</span>
   </div>
- </div>
 
- <div class="window hidden" id="browser">
-  <div class="winhead">🌐 Браузер — Загрузки</div>
-  <div class="content">
-   <h2>Загрузки</h2>
-   <p>Домашняя папка / Downloads</p>
-   <div class="file" id="neo">
-    <span class="icon">📦</span>
-    <span><b>NeoForge</b><br><small>Демонстрационный файл</small></span>
-   </div>
+  <div class="icons">
+    <div><div class="icon">🗂️</div>Файлы</div>
+    <div><div class="icon">🌐</div>Браузер</div>
+    <div><div class="icon">⚙️</div>Настройки</div>
   </div>
- </div>
+
+  <div class="window" id="finishWindow">
+    <div class="winhead">Мастер установки Linux</div>
+    <div class="content">
+      <h2>Установка завершена!</h2>
+      <div class="option">✓ Системные компоненты</div>
+      <div class="option">✓ Настройка рабочего стола</div>
+      <div class="option">✓ Подготовка приложений</div>
+      <p><button id="finishBtn">Завершить установку</button></p>
+    </div>
+  </div>
+
+  <div class="window hidden" id="browser">
+    <div class="winhead">🌐 Браузер — Загрузки</div>
+    <div class="content">
+      <h2>Загрузки</h2>
+      <p>Домашняя папка / Downloads</p>
+      <div class="file" id="neo">
+        <span class="icon">📦</span>
+        <span>
+          <b>NeoForge Installer</b><br>
+          <small>Демонстрационный файл · 128 MB</small>
+        </span>
+      </div>
+      <p>Нажми на файл, чтобы открыть.</p>
+    </div>
+  </div>
 </section>
 
 <div id="cursor" class="hidden">➤</div>
 
 <section id="scare">
- <div class="monster">👹</div>
- <div class="scream">БУУУУ! 😈</div>
- <p>Это всего лишь пранк!</p>
- <button id="skip">Закончить</button>
+  <div class="monster">👹</div>
+  <div class="scream">БУУУУ! 😈</div>
+  <p>Это всего лишь пранк!</p>
+  <button id="skip">Продолжить</button>
 </section>
 
 <section id="end">
- <div>
-  <div style="font-size:90px">😄</div>
-  <h1>ТЕБЯ РОЗЫГРАЛИ!</h1>
-  <p>Это был пранк. Linux не устанавливался.</p>
- </div>
+  <div class="final-screen">
+    <div class="warning">⚠ SYSTEM FAILURE ⚠</div>
+    <div class="gpu">💥</div>
+
+    <h1 class="rx-title">
+      ВАШ RX 9070<br>
+      ОТ AMD НЕ ВЫДЕРЖАЛ!
+    </h1>
+
+    <div class="glitch">GPU CRITICAL ERROR</div>
+
+    <p class="final-text">
+      NeoForge оказался слишком мощным...<br>
+      <b>Шутка! Ваша видеокарта в безопасности.</b>
+    </p>
+
+    <h2 class="yarik">🔥 ЯРИК ТОП! 🔥</h2>
+
+    <button id="replayBtn">Запустить заново</button>
+  </div>
 </section>
 
 <script>
-const $=id=>document.getElementById(id);
-let started=false,ended=false,progress=0;
-let timers=[],audioContext;
+const $ = id => document.getElementById(id);
 
-function later(fn,ms){
- const t=setTimeout(()=>{if(!ended)fn()},ms);
- timers.push(t);
-}
-function clearAll(){
- timers.forEach(clearTimeout);
- timers=[];
-}
-function show(id){
- ["intro","install","desktop","scare","end"].forEach(x=>{
-  $(x).classList.add("hidden");
-  if(x==="scare"||x==="end")$(x).classList.remove("show");
- });
- if(id==="scare"||id==="end")$(id).classList.add("show");
- else $(id).classList.remove("hidden");
-}
-function finish(){
- if(ended)return;
- ended=true;
- clearAll();
- $("cursor").classList.add("hidden");
- show("end");
-}
-function moveCursor(x,y,callback){
- const c=$("cursor");
- c.classList.remove("hidden");
- c.style.left=x+"%";
- c.style.top=y+"%";
- later(()=>{
-  if(callback)callback();
- },1000);
-}
-function screamSound(){
- try{
-  const AC=window.AudioContext||window.webkitAudioContext;
-  if(!AC)return;
-  audioContext=audioContext||new AC();
-  if(audioContext.state==="suspended")audioContext.resume();
-  const ctx=audioContext,now=ctx.currentTime,duration=1.6;
+let started = false;
+let ended = false;
+let progress = 0;
+let timers = [];
+let intervalId = null;
+let audioContext = null;
+let finalMusicStarted = false;
 
-  // Синтезированный мультяшный вопль — без внешних файлов.
-  const osc=ctx.createOscillator();
-  const osc2=ctx.createOscillator();
-  const gain=ctx.createGain();
-  const filter=ctx.createBiquadFilter();
-
-  osc.type="sawtooth";
-  osc.frequency.setValueAtTime(600,now);
-  osc.frequency.exponentialRampToValueAtTime(1200,now+.2);
-  osc.frequency.exponentialRampToValueAtTime(500,now+1.2);
-
-  osc2.type="square";
-  osc2.frequency.setValueAtTime(430,now);
-  osc2.frequency.exponentialRampToValueAtTime(850,now+.2);
-  osc2.frequency.exponentialRampToValueAtTime(350,now+1.2);
-
-  filter.type="lowpass";
-  filter.frequency.value=2000;
-
-  gain.gain.setValueAtTime(.0001,now);
-  gain.gain.exponentialRampToValueAtTime(.16,now+.05);
-  gain.gain.setValueAtTime(.16,now+.7);
-  gain.gain.exponentialRampToValueAtTime(.0001,now+duration);
-
-  osc.connect(filter);
-  osc2.connect(filter);
-  filter.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc.start(now);
-  osc2.start(now);
-  osc.stop(now+duration);
-  osc2.stop(now+duration);
- }catch(e){}
-}
-function showScare(){
- if(ended)return;
- $("cursor").classList.add("hidden");
- show("scare");
- screamSound();
- later(finish,4500);
+function later(fn, ms) {
+  const timer = setTimeout(() => {
+    if (!ended) fn();
+  }, ms);
+  timers.push(timer);
+  return timer;
 }
 
-$("start").onclick=()=>{
- if(started||ended)return;
- started=true;
- try{
-  const AC=window.AudioContext||window.webkitAudioContext;
-  if(AC){audioContext=new AC();audioContext.resume()}
- }catch(e){}
+function clearAll() {
+  timers.forEach(clearTimeout);
+  timers = [];
 
- show("install");
- // Абсолютный предел: пять минут от старта.
- later(finish,300000);
-
- const interval=setInterval(()=>{
-  if(ended){clearInterval(interval);return}
-  progress=Math.min(100,progress+Math.random()*3+1);
-  $("bar").style.width=progress+"%";
-  $("pct").textContent=Math.floor(progress)+"%";
-  $("status").textContent=progress<40?"Подготовка системы…":
-   progress<80?"Копирование файлов…":"Завершение настройки…";
-
-  if(progress>=100){
-   clearInterval(interval);
-   show("desktop");
-
-   // Курсор автоматически нажимает кнопку завершения.
-   later(()=>{
-    moveCursor(68,65,()=>{
-     $("finishWindow").classList.add("hidden");
-     $("browser").classList.remove("hidden");
-
-     // Затем курсор открывает фальшивый файл NeoForge.
-     later(()=>{
-      moveCursor(47,56,showScare);
-     },1200);
-    });
-   },1000);
+  if (intervalId !== null) {
+    clearInterval(intervalId);
+    intervalId = null;
   }
- },500);
+}
+
+function show(id) {
+  ["intro", "install", "desktop", "scare", "end"].forEach(name => {
+    $(name).classList.add("hidden");
+    $(name).classList.remove("show");
+  });
+
+  $(id).classList.remove("hidden");
+
+  if (id === "scare" || id === "end") {
+    $(id).classList.add("show");
+  }
+}
+
+function moveCursor(x, y, callback) {
+  const cursor = $("cursor");
+  cursor.classList.remove("hidden");
+  cursor.style.left = x + "%";
+  cursor.style.top = y + "%";
+
+  later(() => {
+    if (callback) callback();
+  }, 1000);
+}
+
+/* Короткий синтезированный мультяшный звук */
+function playScareSound() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+
+    audioContext = audioContext || new AC();
+
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+
+    const ctx = audioContext;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(880, now + 0.25);
+    osc.frequency.exponentialRampToValueAtTime(330, now + 1.0);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.08, now + 0.05);
+    gain.gain.setValueAtTime(0.08, now + 0.4);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 1.2);
+  } catch (e) {}
+}
+
+function showScare() {
+  if (ended) return;
+
+  $("cursor").classList.add("hidden");
+  show("scare");
+  playScareSound();
+
+  later(finish, 3500);
+}
+
+/* Финальная мелодия и фраза */
+function playYarikTop() {
+  if (finalMusicStarted) return;
+  finalMusicStarted = true;
+
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+
+    if (AC) {
+      audioContext = audioContext || new AC();
+
+      const ctx = audioContext;
+
+      if (ctx.state === "suspended") ctx.resume();
+
+      // Весёлая короткая игровая мелодия
+      const notes = [
+        [523.25, 0],
+        [659.25, 0.18],
+        [783.99, 0.36],
+        [659.25, 0.54],
+        [783.99, 0.72],
+        [1046.5, 0.90],
+        [783.99, 1.15],
+        [1046.5, 1.35],
+        [1318.5, 1.55]
+      ];
+
+      notes.forEach(([frequency, delay]) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const startAt = ctx.currentTime + delay;
+
+        osc.type = "square";
+        osc.frequency.value = frequency;
+
+        gain.gain.setValueAtTime(0.0001, startAt);
+        gain.gain.linearRampToValueAtTime(0.09, startAt + 0.025);
+        gain.gain.exponentialRampToValueAtTime(
+          0.0001, startAt + 0.20
+        );
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(startAt);
+        osc.stop(startAt + 0.22);
+      });
+    }
+  } catch (e) {}
+
+  // Голос зависит от поддержки браузером русской речи
+  if ("speechSynthesis" in window) {
+    try {
+      speechSynthesis.cancel();
+
+      const phrase = new SpeechSynthesisUtterance("Ярик топ!");
+
+      phrase.lang = "ru-RU";
+      phrase.rate = 0.85;
+      phrase.pitch = 0.8;
+      phrase.volume = 0.8;
+
+      later(() => {
+        if (!ended) speechSynthesis.speak(phrase);
+      }, 500);
+    } catch (e) {}
+  }
+}
+
+function finish() {
+  if (ended) return;
+
+  ended = true;
+  clearAll();
+
+  $("cursor").classList.add("hidden");
+  show("end");
+
+  playYarikTop();
+}
+
+$("start").onclick = () => {
+  if (started || ended) return;
+
+  started = true;
+
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) {
+      audioContext = new AC();
+      audioContext.resume();
+    }
+  } catch (e) {}
+
+  show("install");
+
+  // Защита от бесконечного зависания симуляции
+  later(finish, 300000);
+
+  intervalId = setInterval(() => {
+    if (ended) {
+      clearInterval(intervalId);
+      intervalId = null;
+      return;
+    }
+
+    progress = Math.min(100, progress + Math.random() * 3 + 1);
+
+    $("bar").style.width = progress + "%";
+    $("pct").textContent = Math.floor(progress) + "%";
+
+    $("status").textContent =
+      progress < 40 ? "Подготовка системы…" :
+      progress < 80 ? "Копирование файлов…" :
+      "Завершение настройки…";
+
+    if (progress >= 100) {
+      clearInterval(intervalId);
+      intervalId = null;
+
+      show("desktop");
+
+      later(() => {
+        moveCursor(68, 65, () => {
+          $("finishWindow").classList.add("hidden");
+          $("browser").classList.remove("hidden");
+
+          later(() => {
+            moveCursor(47, 56, showScare);
+          }, 1200);
+        });
+      }, 1000);
+    }
+  }, 500);
 };
 
-$("finishBtn").onclick=()=>{
- if(ended)return;
- $("finishWindow").classList.add("hidden");
- $("browser").classList.remove("hidden");
- moveCursor(47,56,showScare);
-};
-$("neo").onclick=showScare;
-$("skip").onclick=finish;
+$("finishBtn").onclick = () => {
+  if (ended) return;
 
-document.addEventListener("keydown",e=>{
- if(e.key==="Tab"&&started&&!ended){
-  e.preventDefault();
-  finish();
- }
- <titel>твая амд рыкс7090ыкст не видержала <titel>
+  $("finishWindow").classList.add("hidden");
+  $("browser").classList.remove("hidden");
+
+  moveCursor(47, 56, showScare);
+};
+
+$("neo").onclick = showScare;
+$("skip").onclick = finish;
+
+$("replayBtn").onclick = () => {
+  location.reload();
+};
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Tab" && started && !ended) {
+    event.preventDefault();
+    finish();
+  }
 });
 </script>
 </body>
